@@ -7,8 +7,10 @@ upstream {{$upstream.Name}} {
 {{range $server := .Servers}}
 server {
 	listen 80;
+	{{if $server.IPv6}}listen [::]:80;{{end}}
 	{{if $server.SSL}}
 	listen 443 ssl;
+	{{if $server.IPv6}}listen [::]:443 ssl;{{end}}
 	ssl_certificate {{$server.SSLCertificate}};
 	ssl_certificate_key {{$server.SSLCertificateKey}};
 	{{end}}

@@ -19,6 +19,7 @@ package controller
 import (
 	"fmt"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 
@@ -320,6 +321,11 @@ func (lbc *LoadBalancerController) syncCfgm(key string) {
 		}
 		if serverNamesHashMaxSize, exists := cfgm.Data["server-names-hash-max-size"]; exists {
 			cfg.MainServerNamesHashMaxSize = serverNamesHashMaxSize
+		}
+		if IPv6Str, exists := cfgm.Data["ipv6"]; exists {
+			if IPv6, err := strconv.ParseBool(IPv6Str); err == nil {
+				cfg.IPv6 = IPv6
+			}
 		}
 	}
 	lbc.cnf.UpdateConfig(cfg)

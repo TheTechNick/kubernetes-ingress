@@ -2,6 +2,7 @@ package nginx
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -102,7 +103,10 @@ func (cnf *Configurator) generateNginxCfg(ingEx *IngressEx, pems map[string]stri
 			glog.Warningf("Host field of ingress rule in %v/%v is empty", ingEx.Ingress.Namespace, ingEx.Ingress.Name)
 		}
 
-		server := Server{Name: serverName}
+		server := Server{
+			Name: serverName,
+			IPv6: ingCfg.IPv6,
+		}
 
 		if pemFile, ok := pems[serverName]; ok {
 			server.SSL = true
@@ -173,7 +177,11 @@ func (cnf *Configurator) createConfig(ingEx *IngressEx) Config {
 	if clientMaxBodySize, exists := ingEx.Ingress.Annotations["nginx.org/client-max-body-size"]; exists {
 		ingCfg.ClientMaxBodySize = clientMaxBodySize
 	}
-
+	if IPv6Str, exists := ingEx.Ingress.Annotations["nginx.org/ipv6"]; exists {
+		if IPv6, err := strconv.ParseBool(IPv6Str); err == nil {
+			ingCfg.IPv6 = IPv6
+		}
+	}
 	return ingCfg
 }
 
