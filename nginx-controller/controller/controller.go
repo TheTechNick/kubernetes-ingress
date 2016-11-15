@@ -325,6 +325,8 @@ func (lbc *LoadBalancerController) syncCfgm(key string) {
 		if IPv6Str, exists := cfgm.Data["ipv6"]; exists {
 			if IPv6, err := strconv.ParseBool(IPv6Str); err == nil {
 				cfg.IPv6 = IPv6
+			} else {
+				glog.Errorf("In configmap %v/%v 'ipv6' contains invalid declaration: %v, ignoring", cfgm.Namespace, cfgm.Name, err)
 			}
 		}
 	}

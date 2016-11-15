@@ -144,7 +144,10 @@ func (cnf *Configurator) generateNginxCfg(ingEx *IngressEx, pems map[string]stri
 	}
 
 	if len(ingEx.Ingress.Spec.Rules) == 0 && ingEx.Ingress.Spec.Backend != nil {
-		server := Server{Name: emptyHost}
+		server := Server{
+			Name: emptyHost,
+			IPv6: ingCfg.IPv6,
+		}
 
 		if pemFile, ok := pems[emptyHost]; ok {
 			server.SSL = true
@@ -180,6 +183,8 @@ func (cnf *Configurator) createConfig(ingEx *IngressEx) Config {
 	if IPv6Str, exists := ingEx.Ingress.Annotations["nginx.org/ipv6"]; exists {
 		if IPv6, err := strconv.ParseBool(IPv6Str); err == nil {
 			ingCfg.IPv6 = IPv6
+		} else {
+			glog.Errorf("In %v/%v nginx.org/ipv6 contains invalid declaration: %v, ignoring", ingEx.Ingress.Namespace, ingEx.Ingress.Name, err)
 		}
 	}
 	return ingCfg
