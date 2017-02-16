@@ -15,6 +15,7 @@ const dhparamFilename = "dhparam.pem"
 
 // NginxController Updates NGINX configuration, starts and reloads NGINX
 type NginxController struct {
+	nginxConfPath  string
 	nginxConfdPath string
 	nginxCertsPath string
 	local          bool
@@ -99,11 +100,14 @@ func NewNginxController(nginxConfPath string, local bool, healthStatus bool) (*N
 	ngxc := NginxController{
 		nginxConfdPath: path.Join(nginxConfPath, "conf.d"),
 		nginxCertsPath: path.Join(nginxConfPath, "ssl"),
+		nginxConfPath:  path.Join(nginxConfPath, "nginx.conf"),
 		local:          local,
 	}
 
 	if !local {
+		createDir(nginxConfPath)
 		createDir(ngxc.nginxCertsPath)
+		createDir(ngxc.nginxConfdPath)
 	}
 
 	cfg := &NginxMainConfig{ServerNamesHashMaxSize: NewDefaultConfig().MainServerNamesHashMaxSize, HealthStatus: healthStatus}
@@ -245,7 +249,7 @@ func (nginx *NginxController) Start() {
 }
 
 func createDir(path string) {
-	if err := os.Mkdir(path, os.ModeDir); err != nil {
+	if err := os.Mkdir(path, 0770); err != nil {
 		glog.Fatalf("Couldn't create directory %v: %v", path, err)
 	}
 }
@@ -280,7 +284,7 @@ func (nginx *NginxController) UpdateMainConfigFile(cfg *NginxMainConfig) {
 		glog.Fatalf("Failed to parse the main config template file: %v", err)
 	}
 
-	filename := "/etc/nginx/nginx.conf"
+	filename := nginx.nginxConfPath
 	glog.V(3).Infof("Writing NGINX conf to %v", filename)
 
 	if glog.V(3) {
@@ -301,3 +305,5 @@ func (nginx *NginxController) UpdateMainConfigFile(cfg *NginxMainConfig) {
 
 	glog.V(3).Infof("The main NGINX configuration file had been updated")
 }
+
+type Nginx struct{}
