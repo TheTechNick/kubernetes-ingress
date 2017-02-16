@@ -5,11 +5,12 @@ upstream {{$upstream.Name}} {
 }{{end}}
 
 server {
-	listen 80{{if .ProxyProtocol}} proxy_protocol{{end}};
+	listen 80{{if .ProxyProtocol}} proxy_protocol{{end}}{{if not .Name}} default_server{{end}};
 	{{if .SSL}}
 	listen 443 ssl{{if .HTTP2}} http2{{end}}{{if .ProxyProtocol}} proxy_protocol{{end}};
 	ssl_certificate {{.SSLCertificate}};
 	ssl_certificate_key {{.SSLCertificateKey}};
+
 	{{end}}
 	{{range $setRealIPFrom := .SetRealIPFrom}}
 	set_real_ip_from {{$setRealIPFrom}};{{end}}
