@@ -1,6 +1,6 @@
 all: push
 
-VERSION = 0.7.0-merged
+VERSION = 0.7.5-merged
 TAG = $(VERSION)
 PREFIX = quay.io/nico_schieder/nginxinc-kubernetes-ingress
 
@@ -29,7 +29,7 @@ else
 	go test ./...
 endif
 
-container: test nginx-ingress
+container:
 	docker build -f $(DOCKERFILE) -t $(PREFIX):$(TAG) .
 
 push: container
