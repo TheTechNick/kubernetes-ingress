@@ -1,6 +1,6 @@
 all: push
 
-VERSION = 0.7.5-merged
+VERSION = 0.7.8-merged
 TAG = $(VERSION)
 PREFIX = quay.io/nico_schieder/nginxinc-kubernetes-ingress
 
